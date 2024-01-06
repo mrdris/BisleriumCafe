@@ -1,17 +1,33 @@
-﻿@inherits LayoutComponentBase
+﻿@using BisleriumCafe.Data.Provider
+@inject NavigationManager NavManager
+@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
+<div class="flex">
+    @if (_globalState.CurrentUser != null)
+    {
+        <nav class="h-screen flex flex-col w-[20%] bg-black p-2">
+            <NavMenu Username="@_globalState.CurrentUser.Username" UserRole="@_globalState.CurrentUser.Role" LogoutHandler="LogoutHandler" />
+        </nav>
+    }
+    <main class="p-4 h-screen">
+        <article>
+            <CascadingValue Value="@_globalState">
+                @Body
+            </CascadingValue>
         </article>
     </main>
 </div>
+@code {
+    private GlobalState _globalState = new();
+
+    protected override void OnInitialized()
+    {
+        UsersService.SeedUsers();
+    }
+    private void LogoutHandler()
+    {
+        _globalState.CurrentUser = null;
+        NavManager.NavigateTo("/login");
+    }
+}

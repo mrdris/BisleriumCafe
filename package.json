@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "buildcss:debug": "cross-env TAILWIND_MODE=build postcss ./Styles/tailwind.css -o ./wwwroot/css/tailwind.debug.css",
+    "buildcss:debug": "cross-env TAILWIND_MODE=watch postcss ./Styles/tailwind.css -o ./wwwroot/css/tailwind.debug.css",
     "buildcss:release": "cross-env NODE_ENV=production postcss ./Styles/tailwind.css -o ./wwwroot/css/tailwind.release.css"
   },
   "author": "",

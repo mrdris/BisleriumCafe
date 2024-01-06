@@ -12,6 +12,10 @@ namespace BisleriumCafe
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                   
+                    fonts.AddFont("Font-Brands-Regular.otf", "FAB");
+                    fonts.AddFont("Font-Free-Regular.otf", "FAR");
+                    fonts.AddFont("Font-Free-Solid.otf", "FAS");
                 });
 
             builder.Services.AddMauiBlazorWebView();

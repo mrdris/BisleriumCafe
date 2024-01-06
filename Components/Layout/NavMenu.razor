@@ -1,27 +1,36 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">BisleriumCafe</a>
-    </div>
-</div>
+﻿
+<h3 class="text-3xl text-white mx-auto mt-2">Bislerium</h3>
+<h3 class="text-xl text-white mx-auto">Cafe</h3>
+<h5 class="text-white mt-4 mx-auto capitalize">Welcome <strong>@Username</strong>!</h5>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+<NavLink class="text-white mt-4 border-b-2 border-white hover:bg-white hover:text-black p-2" href="coffee-order">
+    Coffee Order
+</NavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
+@if (UserRole == UserRole.Admin)
+{
+    <NavLink class="text-white mt-4 border-b-2 border-white hover:bg-white hover:text-black p-2" href="add-staff">
+        Add Staff
+    </NavLink>
+    <NavLink class="border-b-2 border-white hover:bg-white hover:text-black p-2 text-white mt-4" href="coffee-reports">
+        Coffee Reports
+    </NavLink>
+}
+
+<NavLink class="border-b-2 border-white hover:bg-white hover:text-black p-2 text-white mt-4" href="change-password">
+    Change Password
+</NavLink>
+
+<button class="mt-auto py-2 text-xl font-semibold border-2 border-white bg-transparent text-white w-full" @onclick="LogoutHandler">Logout</button>
+
+@code {
+    [Parameter]
+    public string Username { get; set; }
+    [Parameter]
+    public UserRole UserRole { get; set; }
+    [Parameter]
+    public EventCallback LogoutHandler { get; set; }
+
+}
+
+

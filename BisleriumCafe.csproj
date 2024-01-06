@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
         <!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
@@ -62,24 +61,29 @@
         <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+        <PackageReference Include="QuestPDF" Version="2023.12.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\Services\" />
     </ItemGroup>
 
 	<Target Name="CheckNPMIsInstalled" BeforeTargets="InstallNPM">
 		<Exec Command="npm -v" ContinueOnError="true">
-			<Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
 		</Exec>
-		<Error Condition="'$(ErrorCode)' != '0'" Text="You must install NPM"/>
+		<Error Condition="'$(ErrorCode)' != '0'" Text="You must install NPM" />
 	</Target>
 
 	<Target Name="InstallNPM" BeforeTargets="BuildTailwindCSS">
-		<Exec Command="npm install"/>
-		<Touch Files="$(NpmLastInstall)" AlwaysCreate="true"/>
+		<Exec Command="npm install" />
+		<Touch Files="$(NpmLastInstall)" AlwaysCreate="true" />
 			
 
 	</Target>
 	<Target Name="BuildTailwindCSS" BeforeTargets="Compile">
-		<Exec Command="npm run buildcss:debug" Condition="'$(Configuration)' == 'Debug'"/>
-		<Exec Command="npm run buildcss:release" Condition="'$(Configuration)'=='Release'"/>
+		<Exec Command="npm run buildcss:debug" Condition="'$(Configuration)' == 'Debug'" />
+		<Exec Command="npm run buildcss:release" Condition="'$(Configuration)'=='Release'" />
 	</Target>
 	
 </Project>

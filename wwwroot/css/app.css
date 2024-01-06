@@ -1,5 +1,6 @@
 ﻿html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height:100%;
 }
 
 a, .btn-link {
@@ -24,6 +25,9 @@ h1:focus {
     outline: none;
 }
 
+input:focus {
+    outline: none;
+}
 .valid.modified:not([type=checkbox]) {
     outline: 1px solid #26b050;
 }

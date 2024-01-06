@@ -1,0 +1,206 @@
+﻿@page "/add-staff"
+
+
+<nav class="flex justify-between">
+    <h1 class="text-2xl text-center font-semibold">Users</h1>
+    <button class="bg-red-600 text-white px-6 py-4" @onclick="OpenAddUserDialog">
+        Add
+    </button>
+</nav>
+<table class="w-full mt-4">
+    <thead class="font-semibold border-b-2 border-gray-400">
+        <tr>
+            <th class="text-center">Username</th>
+            <th class="text-center">Role</th>
+            <th class="text-center">Created At</th>
+            <th class="text-center">CreatedBy</th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody class="text-lg text-gray-400">
+        @foreach (var user in _users)
+        {
+            <tr class="text-base text-gray-600">
+                <td class="align-top text-center">@user.Username</td>
+                <td class="align-top text-center">@user.Role.ToString()</td>
+                <td class="align-top text-center">@user.CreatedAt.ToString("MMM dd, yyyy h:mm tt")</td>
+                <td class="align-top text-center">
+                    @{
+                        var creator = UsersService.GetById(user.CreatedBy);
+                        <span>@(creator == null ? "Unknown" : creator.Username)</span>
+                    }
+                </td>
+                <td class="align-top text-center">
+                    <button disabled="@(_globalState.CurrentUser != null ? _globalState.CurrentUser.Id == user.Id : false)"
+                            class="border border-red-500 bg-transparent px-6 text-sm hover:bg-red-600 hover:text-white" type="button" @onclick="()=>OpenDeleteUserDialog(user)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@if (_showAddUserDialog)
+{
+    <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-8 rounded shadow-md w-96">
+            <h2 class="text-2xl font-semibold mb-4 text-center">Add User</h2>
+
+            <form class="flex flex-col">
+
+                    <input type="text" class="block w-full border-b-2 mb-4  placeholder:text-gray-700 placeholder:text-sm mb-4 border-gray-300 text-sm" @bind="_username" placeholder="Username" />
+                <input type="password" id="password" class="block w-full border-b-2 mb-4 placeholder:text-gray-700 placeholder:text-sm text-sm border-gray-300 " @bind="_password" placeholder="Password" />
+
+
+                <div class="mb-4">
+                    <div class="flex items-center">
+                        <input id="userRole" type="radio" class="form-radio" name="role" value="@UserRole.Staff" @onchange="RoleChangeHandler" checked="@(_role == UserRole.Staff)">
+                        <label for="userRole" class="ml-2 text-sm ">Staff</label>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input id="adminRole" type="radio" class="form-radio" name="role" value="@UserRole.Admin" @onchange="RoleChangeHandler" checked="@(_role == UserRole.Admin)">
+                        <label for="adminRole" class="ml-2 text-sm ">Admin</label>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(_addUserErrorMessage))
+                {
+                    <div class="mb-4">
+                        <p class="text-red-500 text-sm">@_addUserErrorMessage</p>
+                    </div>
+                }
+
+                <div class="flex justify-end">
+                    <button type="button" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-transparent hover:border hover:bg-transparent border:bg-red-600 hover:text-black" @onclick="OnAddUserDialogClose">Cancel</button>
+                    <button type="button" class="ml-2 px-4 py-2 bg-black text-white rounded bg-green-600 hover:bg-black " @onclick="AddUser">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+}
+
+
+@if (_showDeleteUserDialog)
+{
+    <div class="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-8 rounded shadow-md">
+            <h2 class="text-2xl font-semibold mb-4">Delete User</h2>
+
+            <p class="mb-4">Are you sure you want to delete <strong>@_deleteUser.Username</strong> user and their data?</p>
+
+            @if (!string.IsNullOrEmpty(_deleteUserErrorMessage))
+            {
+                <div class="mb-4">
+                    <p class="text-red-500">@_deleteUserErrorMessage</p>
+                </div>
+            }
+
+            <div class="flex justify-end">
+                <button type="button" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400" @onclick="OnDeleteUserDialogClose">Cancel</button>
+                <button type="button" class="ml-2 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600" @onclick="OnDeleteUserDialogConfirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+}
+
+@code {
+    [CascadingParameter]
+    private GlobalState _globalState { get; set; }
+    private List<User> _users { get; set; }
+    private bool _showAddUserDialog { get; set; }
+    private bool _showDeleteUserDialog { get; set; }
+    private string _addUserErrorMessage { get; set; }
+    private string _deleteUserErrorMessage { get; set; }
+    private User _deleteUser { get; set; }
+    private string _username { get; set; }
+    private string _password { get; set; }
+    private UserRole _role { get; set; }
+
+    protected override void OnInitialized()
+    {
+        _users = UsersService.GetAll();
+    }
+
+    private void OpenAddUserDialog()
+    {
+        _showAddUserDialog = true;
+        _username = "";
+        _password = "";
+        _role = UserRole.Staff;
+    }
+    private void OnAddUserDialogClose()
+    {
+        _showAddUserDialog = false;
+    }
+
+    private void AddUser()
+    {
+        try
+        {
+            // Validate input (you might have more validation logic here)
+            if (string.IsNullOrWhiteSpace(_username) || string.IsNullOrWhiteSpace(_password))
+            {
+                _addUserErrorMessage = "Username and password are required.";
+                return;
+            }
+
+            // Check if the username is unique (you might have a more sophisticated check)
+            /* if (UsersService.IsUsernameTaken(_username))
+                 {
+                 _addUserErrorMessage = "Username is already taken. Please choose a different one.";
+             return;
+            }*/
+
+            // Call the existing method to create a new user
+            _addUserErrorMessage = "";
+            _users = UsersService.Create(_globalState.CurrentUser.Id, _username, _password, _role);
+
+            // Optionally, you can refresh the user list or perform any other necessary actions
+
+            // Clear any previous error messages
+            _addUserErrorMessage = "";
+
+            // Close the dialog after adding the user
+            _showAddUserDialog = false;
+        }
+        catch (Exception e)
+        {
+            _addUserErrorMessage = e.Message;
+        }
+    }
+
+    private void RoleChangeHandler(ChangeEventArgs e)
+    {
+        _role = (UserRole)Enum.Parse(typeof(UserRole), e.Value.ToString());
+    }
+
+    private void OpenDeleteUserDialog(User user)
+    {
+        _deleteUser = user;
+        _showDeleteUserDialog = true;
+    }
+    private void OnDeleteUserDialogClose()
+    {
+        _showDeleteUserDialog = false;
+        _deleteUser = null;
+    }
+    private void OnDeleteUserDialogConfirm()
+    {
+        try
+        {
+            _deleteUserErrorMessage = "";
+            _users = UsersService.Delete(_deleteUser.Id);
+            _showDeleteUserDialog = false;
+            _deleteUser = null;
+        }
+        catch (Exception e)
+        {
+            _deleteUserErrorMessage = e.Message;
+        }
+    }
+}
